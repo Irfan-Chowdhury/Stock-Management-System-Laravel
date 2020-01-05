@@ -33,6 +33,13 @@
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Category Setup</span></a>
         </li>
+        
+        <!-- Company Setup -->
+        <li class="nav-item">
+          <a class="nav-link" href="{{route('company.index')}}">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Company Setup</span></a>
+        </li>
   
         <!-- Divider -->
         <hr class="sidebar-divider d-none d-md-block">
