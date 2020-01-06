@@ -40,6 +40,13 @@
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Company Setup</span></a>
         </li>
+        
+        <!-- Item Setup -->
+        <li class="nav-item">
+          <a class="nav-link" href="{{route('item.create')}}">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Item Setup</span></a>
+        </li>
   
         <!-- Divider -->
         <hr class="sidebar-divider d-none d-md-block">
