@@ -39,5 +39,12 @@ Route::group(['namespace'=>'Backend'], function () {
         Route::get('/create','ItemController@create')->name('item.create');
         Route::post('/store','ItemController@store')->name('item.store');
     });
+   
+    Route::group(['prefix' => 'stockin'], function () {
+        Route::get('/create','StockInController@create')->name('stockin.create');
+        Route::get('/company-wise-item','StockInController@companyWiseItem')->name('company-wise-item'); //AJAX
+        Route::get('/show-reorder-level','StockInController@showReorderLevel')->name('show-reorder-level'); //AJAX
+        Route::post('/store','StockInController@store')->name('stockin.store');
+    });
 
 });

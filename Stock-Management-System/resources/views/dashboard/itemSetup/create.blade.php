@@ -19,7 +19,7 @@
                     @csrf
                     <div class="form-group">
                         <label for="category_id">Category</label>
-                        <select class="form-control" id="category_id" name="category_id">
+                        <select class="form-control @error('category_id') is-invalid @enderror" id="category_id" name="category_id">
                             <option selected>--Select--</option>
                             @foreach ($categories as $category)
                                 <option value="{{$category->id}}">{{$category->categoryName}}</option>
@@ -33,7 +33,7 @@
 
                     <div class="form-group">
                         <label for="company_id">Company</label>
-                        <select class="form-control" id="company_id" name="company_id">
+                        <select id="company_id" name="company_id" class="form-control @error('category_id') is-invalid @enderror">
                             <option selected>--Select--</option>
                             @foreach ($companies as $company)
                                 <option value="{{$company->id}}">{{$company->companyName}}</option>
@@ -46,7 +46,7 @@
 
                     <div class="form-group">
                         <label for="itemName">Item Name</label>
-                        <input type="text" class="form-control" name="itemName" placeholder="Type Item Name">
+                        <input type="text" class="form-control @error('itemName') is-invalid @enderror" name="itemName" placeholder="Type Item Name">
                     </div>
                     @error('itemName')
                         <div class="alert alert-danger">{{ $message }}</div>

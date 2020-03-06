@@ -21,7 +21,7 @@ class ItemController extends Controller
     public function store(Request $request)
     {
         $validator= Validator::make($request->all(),[
-            'itemName'    => 'required|min:3|max:15|unique:items|regex:/^[a-zA-Z]+[a-zA-Z0-9]*$/', //must te start with Letter, not number first, don't use space & _
+            'itemName'    => 'required|min:3|max:15|unique:items', //must te start with Letter, not number first, don't use space & _
             'category_id' => 'exists:categories,id', //columnName =>'exists:tableName,columnName (of tableName)'
             'company_id' => 'exists:companies,id',            
             'reorderLevel' => 'numeric',            

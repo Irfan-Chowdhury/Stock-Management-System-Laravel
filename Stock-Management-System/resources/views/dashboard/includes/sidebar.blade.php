@@ -47,6 +47,13 @@
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Item Setup</span></a>
         </li>
+        
+        <!-- Stock In -->
+        <li class="nav-item">
+          <a class="nav-link" href="{{route('stockin.create')}}">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Stock In</span></a>
+        </li>
   
         <!-- Divider -->
         <hr class="sidebar-divider d-none d-md-block">
