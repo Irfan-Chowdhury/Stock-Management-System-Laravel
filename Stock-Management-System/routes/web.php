@@ -60,4 +60,10 @@ Route::group(['namespace'=>'Backend'], function () {
         Route::post('/lost','StockOutController@lost')->name('stockout.lost');
     });
 
+    //Search & View Items
+    Route::group(['prefix' => 'searchAndViewItems'], function () {
+        Route::get('/index','searchAndViewItemsController@index')->name('searchAndViewItems.index');
+        Route::get('/show','searchAndViewItemsController@show')->name('searchAndViewItems.show');
+    });
+
 });
