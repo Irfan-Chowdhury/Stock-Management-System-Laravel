@@ -21,33 +21,32 @@ class StockInController extends Controller
         // return view('dashboard.stockIn.temporary',compact('companies'));
     }
 
+    // ========== Cascading & Reorder_AvlQuantity Start =========
+
 
     public function companyWiseItem(Request $request)
     {
         $items = Item::where('company_id',$request->company_id)
-                                    ->get();
+                    ->get();
         return view('dashboard.stockIn.company_wise_item',compact('items'));
     }
 
-    public function showReorderLevel(Request $request)
+    public function showReorderLevel_avlQuantity(Request $request)
     {
-        $item = Item::where([
+        $item = Item::where([  //for reorderLevel
                     'company_id' => $request->company_id,
-                    'id'         => $request->id,
+                    'id'         => $request->id, //itemId
                 ])->first();
         
-        $stockIn = StockIn::where([
+        $stockIn = StockIn::where([  //for avaible quantity (stock_in)
                     'company_id' => $request->company_id,
                     'item_id'    => $request->id,
                 ])->first();
-        
-        return view('dashboard.stockIn.item_wise_reorderLevel',compact('item','stockIn'));
 
-       
-        // $states = DB::table("states")->where("countries_id",$id)->pluck("name","id");
-        // return json_encode($states);
+        return view('dashboard.stockIn.item_wise_reorderLevel',compact('item','stockIn'));
     }
 
+    // =========== Cascading & Reorder_AvlQuantity End =======
 
 
     public function store(Request $request)
@@ -63,12 +62,14 @@ class StockInController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
+        //আগের আইটেমে এভেইলেবল কোয়ান্টিটি ঐটা সিলেক্ট করবে 
         $previous_StockIn = StockIn::select('stock_in')
                         ->where([
                             'company_id' => $request->company_id,
                             'item_id'    => $request->item_id,
                         ])->first();
 
+        //যদি থেকে থাকে তাইলে নতুনভাবে আপডেট হবে 
         if (isset($previous_StockIn)) 
         {
             $stockIn   = StockIn::where([
@@ -79,12 +80,23 @@ class StockInController extends Controller
             $stockIn->stock_in   = $stockIn->stock_in + $request->stock_in; //addition with previuos
             $stockIn->update();
 
-        }
-        else {
-            $stock_in             = new StockIn();
-            $stock_in->company_id = $request->company_id;
-            $stock_in->item_id    = $request->item_id;
-            $stock_in->stock_in   = $request->stock_in;
+        } 
+        else {  //কোন আইটেম না থাকলে তাইলে নতুনভাবে এড হবে
+            
+            $categoryId = DB::table('items')
+                    ->select('items.category_id')
+                    ->where([
+                        'company_id' => $request->company_id,
+                        'id'         => $request->item_id,
+                    ])->first();
+
+            // return $categoryId->category_id;
+            
+            $stock_in              = new StockIn();
+            $stock_in->company_id  = $request->company_id;
+            $stock_in->category_id = $categoryId->category_id;
+            $stock_in->item_id     = $request->item_id;
+            $stock_in->stock_in    = $request->stock_in;
             $stock_in->save();
         }
 
