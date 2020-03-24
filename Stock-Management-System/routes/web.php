@@ -47,4 +47,17 @@ Route::group(['namespace'=>'Backend'], function () {
         Route::post('/store','StockInController@store')->name('stockin.store');
     });
 
+    Route::group(['prefix' => 'stockout'], function () {
+        Route::get('/create','StockOutController@create')->name('stockout.create');
+        // Route::get('/company-wise-item','StockInController@companyWiseItem')->name('company-wise-item'); //AJAX
+        // Route::get('/show-reorder-level','StockInController@showReorderLevel_avlQuantity')->name('show-reorder-level'); //AJAX
+        Route::get('/company-wise-item-stockout','StockInController@companyWiseItem')->name('company-wise-item-stockout'); //AJAX
+        Route::get('/show-reorder-level-stockout','StockInController@showReorderLevel_avlQuantity')->name('show-reorder-level-stockout'); //AJAX
+        Route::get('/show','StockOutController@show')->name('stockout.show');
+        Route::post('/add','StockOutController@add')->name('stockout.add');
+        Route::post('/sell','StockOutController@sell')->name('stockout.sell');
+        Route::post('/damage','StockOutController@damage')->name('stockout.damage');
+        Route::post('/lost','StockOutController@lost')->name('stockout.lost');
+    });
+
 });

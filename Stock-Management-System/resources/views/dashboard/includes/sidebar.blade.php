@@ -54,6 +54,13 @@
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Stock In</span></a>
         </li>
+
+         <!-- Stock Out -->
+         <li class="nav-item">
+          <a class="nav-link" href="{{route('stockout.create')}}">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Stock Out</span></a>
+        </li>
   
         <!-- Divider -->
         <hr class="sidebar-divider d-none d-md-block">
