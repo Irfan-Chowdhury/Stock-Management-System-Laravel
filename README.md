@@ -28,3 +28,8 @@ In a small shop, items are going out of stock for: Sales, damage or for losing t
 ## Search & View Items Summary
 
 It is a report (search and view only). User will select company and category, and press Search button. All related information will be displayed. Note that, user may select only company or only category name or both.
+
+## View Sales Between Two Dates:
+
+This is a report (search and view only). User will select any two dates (From Date must be equal or smaller than To Date) and press Search button. Only sold items with sold quantity will be displayed. Note that Items which is not sold between dates will not be displayed.
+
