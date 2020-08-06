@@ -15,4 +15,15 @@ class StockOut extends Model
         'damage_quantity',
         'lost_quantity',
     ];
+
+    public function item()  
+    {
+        return $this->belongsTo(Item::class);
+        // return $this->belongsTo(Item::class,'item_id'); //or you can write this line
+    }
+    
+    public function company()  
+    {
+        return $this->belongsTo(Company::class);
+    }
 }

@@ -65,5 +65,12 @@ Route::group(['namespace'=>'Backend'], function () {
         Route::get('/index','searchAndViewItemsController@index')->name('searchAndViewItems.index');
         Route::get('/show','searchAndViewItemsController@show')->name('searchAndViewItems.show');
     });
+    
+    //view sales between two dates
+    Route::group(['prefix' => 'view-sales-between-dates'], function () {
+        Route::get('/index','ViewSalesBetweenDatesController@index')->name('view-sales-between-date.index'); 
+        Route::get('/show','ViewSalesBetweenDatesController@show')->name('view-sales-between-date.show');
+    });
+
 
 });

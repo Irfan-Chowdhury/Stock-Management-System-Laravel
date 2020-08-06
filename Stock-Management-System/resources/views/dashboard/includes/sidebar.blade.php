@@ -69,6 +69,13 @@
             <span>Search & View Items</span></a>
         </li>
 
+        <!-- View Sales Between Two Dates -->
+        <li class="nav-item">
+          <a class="nav-link" href="{{route('view-sales-between-date.index')}}">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>View Sales Bet Dates</span></a>
+        </li>
+        
         <!-- Divider -->
         <hr class="sidebar-divider d-none d-md-block">
   
