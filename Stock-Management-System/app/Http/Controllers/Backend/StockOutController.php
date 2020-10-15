@@ -196,13 +196,14 @@ class StockOutController extends Controller
             $stock_out->update();
                                 
 
-            $stockIn_id  = StockIn::select('id')
+            $stockIn_id  = StockIn::select('id') //stock_in এর স্পেসিফিক রো এর id সিলেক্ট করা হচ্ছে । 
                                 ->where('company_id',$item->company_id)
                                 ->where('item_id',$item->item_id)
                                 ->first(); 
-            $stockIn  = StockIn::find($stockIn_id->id);
 
-            $stockIn->stock_in = $stockIn->stock_in - $stock_out->sell_quantity; //or follow next line line
+            $stockIn  = StockIn::find($stockIn_id->id); // স্পেসিফিক রো এর আইডিটা ধরলো । 
+
+            $stockIn->stock_in = $stockIn->stock_in - $stock_out->sell_quantity; //stock_in থেকে ডাটা ডিলিট হয়ে গেলো ।  //or follow next line line
             // $stockIn->stock_in = $stockIn->stock_in - $item->add_quantity; 
             $stockIn->update();
 

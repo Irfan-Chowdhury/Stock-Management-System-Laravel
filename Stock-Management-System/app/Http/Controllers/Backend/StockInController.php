@@ -38,12 +38,21 @@ class StockInController extends Controller
                     'id'         => $request->id, //itemId
                 ])->first();
         
+
+
+        // $stockIn = StockIn::where([  //for avaible quantity (stock_in)
+        //             'company_id' => $request->company_id,
+        //             'item_id'    => $request->id, //itemId
+        //         ])->first();  
+        
+                    //অথবা নিচেরটা
+
         $stockIn = StockIn::where([  //for avaible quantity (stock_in)
                     'company_id' => $request->company_id,
-                    'item_id'    => $request->id,
-                ])->first();
+                    'item_id'    => $request->id, //itemId
+                ])->value('stock_in');  //<--- difference here
 
-        return view('dashboard.stockIn.item_wise_reorderLevel',compact('item','stockIn'));
+        return view('dashboard.stockIn.item_wise_reorderLevel_and_avlQuantity',compact('item','stockIn'));
     }
 
     // =========== Cascading & Reorder_AvlQuantity End =======

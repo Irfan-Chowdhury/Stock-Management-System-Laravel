@@ -75,6 +75,8 @@
     <script>
         $('#companyId').change(function() 
         {
+            console.log('ok');
+
             var companyId = $('#companyId').val();
             if (companyId) 
             {
@@ -85,7 +87,7 @@
                 });
             }
             else{
-                $('#itemId').empty().html('<option>--Select Item--</option>');
+                $('#itemId').empty().html('<option>--Select Item--</option>');  //Item সিলেক্ট করার Drop-Down টি
             }
         });
 
@@ -98,7 +100,7 @@
             {
                 $.get("{{route('show-reorder-level')}}",{company_id:companyId , id:itemId}, function (data) 
                 {
-                    $('#reorderLevel_availableQuantity').empty().html(data);
+                    $('#reorderLevel_availableQuantity').empty().html(data); //Reorder Level & Availble Quantity তে ডাটা শো করার DIV টা । 
                 });            
             }
         });

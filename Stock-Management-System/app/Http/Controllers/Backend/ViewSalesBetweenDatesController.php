@@ -42,6 +42,16 @@ class ViewSalesBetweenDatesController extends Controller
                 ->whereBetween('created_at', [$from." 00:00:00", $to." 23:59:59"])
                 ->groupBy('item_id','company_id')
                 ->get();
+        
+        // $data = DB::table('stock_outs')
+        //         ->select('item_id','company_id', DB::raw('SUM(sell_quantity) as quantity'))    
+        //         // ->where('status','SOLD')
+        //         ->whereBetween('created_at', [$from." 00:00:00", $to." 23:59:59"])
+        //         ->groupBy('item_id','company_id')
+        //         ->having('status','=','SOLD')
+        //         ->get();
+
+        // return $data;
 
         return view('dashboard.view_sales_between_dates.index',compact('data')); 
     }

@@ -7,7 +7,8 @@
 <div class="form-group">
     <label for="availableQuantity">Available Quantity</label>
     @if (isset($stockIn))
-        <input type="number" value="{{$stockIn->stock_in}}" class="form-control" readonly>
+        {{-- <input type="number" value="{{$stockIn->stock_in}}" class="form-control" readonly> --}} <!-- অথবা নিচেরটা -->
+        <input type="number" value="{{$stockIn}}" class="form-control" readonly>
     @else
         <input type="number" value="0" class="form-control" readonly>
     @endif
