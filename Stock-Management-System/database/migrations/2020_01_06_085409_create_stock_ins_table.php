@@ -16,11 +16,13 @@ class CreateStockInsTable extends Migration
         Schema::create('stock_ins', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('company_id');
+            $table->unsignedBigInteger('category_id');
             $table->unsignedBigInteger('item_id');
             $table->bigInteger('stock_in');
             $table->timestamps();
 
             $table->foreign('company_id')->references('id')->on('companies');
+            $table->foreign('category_id')->references('id')->on('categories');
             $table->foreign('item_id')->references('id')->on('items');
         });
     }
