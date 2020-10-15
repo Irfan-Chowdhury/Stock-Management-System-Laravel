@@ -12,12 +12,12 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('login');
 });
 
-Route::get('/dashboard','Backend\HomeController@index')->name('dashboard');
+Route::get('/dashboard','Backend\HomeController@index')->name('dashboard')->middleware('IsLoggedIn');
 
-Route::group(['namespace'=>'Backend'], function () {
+Route::group(['namespace'=>'Backend','middleware'=>'IsLoggedIn'], function () {
     
     Route::group(['prefix' => 'category'], function () {
         Route::get('/','CategoryController@index')->name('category.index');
@@ -74,3 +74,6 @@ Route::group(['namespace'=>'Backend'], function () {
 
 
 });
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
