@@ -63,95 +63,56 @@ class StockOutController extends Controller
         //Validation end
 
 
-        $last_row_action_no  =  DB::table('stock_outs')
-                            // ->where('status','=','SOLD')
-                            ->where('status','!=',NULL)
-                            ->orderBy('id','DESC')
-                            ->limit(1)
-                            ->first();
-        if (isset($last_row_action_no)) 
+        //First check that available quantity is sufficient or not
+        $stockIn = StockIn::select('stock_in')
+                            ->where([
+                                'company_id' => $request->company_id,
+                                'item_id'    => $request->item_id,
+                            ])->first();
+
+        if ($request->add_quantity > $stockIn->stock_in ) //Check
         {
-            $last_action_no = (int)$last_row_action_no->action_no + 1 ; //লাস্টের সাথে ১ যোগ হবে 
-        }
+            session()->flash('type','danger');
+            session()->flash('message','Available Quantity is not sufficient');
 
-        //Go 'else' line if you add new Item || or follow the bellow line  (update add) if want update data 
+            return redirect()->back();
+        }                                               //Check end
+        else
+        {
+            $data_check = StockOut::where([ // যদি ডাটাবেজে থাকে 
+                                'company_id' => $request->company_id, 
+                                'item_id'    => $request->item_id,
+                                'action_no'  => 1, 
+                                'status'     => NULL, 
+                            ])
+                            ->first();
 
-        //(update add) কোন আইটেম সিলেক্ট করার পর আবার বৃদ্ধি করতে চাইলে ডাটাবাজের আগের আইটেমে add_quantity ঐটা সিলেক্ট করবে 
-        $previous_add_quantity = StockOut::select('add_quantity')
-                        ->where([
-                            'company_id' => $request->company_id, //Blade ফাইল থেকে রিকুয়েস্ট আসতেছে 
-                            'item_id'    => $request->item_id,
-                            'action_no'  => $last_action_no, // যদি ডাটাবেজে থাকে 
-                            'status'     => NULL, 
-                        ])->first();
-
-        //(update add) যদি থেকে থাকে তাইলে ঐটাই আপডেট হবে 
-        if (isset($previous_add_quantity)) 
-        {   
-            $updateAddQuantity  = StockOut::where([
-                'company_id' => $request->company_id,
-                'item_id'    => $request->item_id,
-                'action_no'  => $last_action_no, // যদি ডাটাবেজে থাকে
-                'status'     => NULL,
-                ])->first();
-                      
-            $updateAddQuantity->add_quantity = $updateAddQuantity->add_quantity + $request->add_quantity;
-            // $updateAddQuantity->update();
-
-
-            //Now First check that available quantity is sufficient or not
-            $stockIn = StockIn::select('stock_in')
-                                ->where([
-                                    'company_id' => $request->company_id,
-                                    'item_id'    => $request->item_id,
-                                ])->first();
-
-            if ($updateAddQuantity->add_quantity > $stockIn->stock_in ) //Check
+            if ($data_check) 
             {
-                session()->flash('type','danger');
-                session()->flash('message','Available Quantity is not sufficient');
-            }                                                           //Check end
-            else{
-                $updateAddQuantity->update();
+                $stockout  = StockOut::Find($data_check->id);
+
+                $data_check->add_quantity = $data_check->add_quantity + $request->add_quantity;
+                $data_check->update();
             }
-            
-            
-        }
-        else{ //কোন আইটেম না থাকলে তাইলে নতুনভাবে এড হবে
-
-            //First check that available quantity is sufficient or not
-            $stockIn = StockIn::select('stock_in')
-                                ->where([
-                                    'company_id' => $request->company_id,
-                                    'item_id'    => $request->item_id,
-                                ])->first();
-
-            if ($request->add_quantity > $stockIn->stock_in ) //Check
+            else 
             {
-                session()->flash('type','danger');
-                session()->flash('message','Available Quantity is not sufficient');
-                
-                return redirect()->back();
-            }                                               //Check end
-            else{
                 $stockout               = new StockOut();
                 $stockout->company_id   = $request->company_id; 
                 $stockout->item_id      = $request->item_id; 
                 $stockout->add_quantity = $request->add_quantity;
-                $stockout->action_no    = $last_action_no ;
-                
+                $stockout->action_no    = 1 ;
+
                 $stockout->save();
-            }            
+            }
         }
 
-        // after save (add) the Items will show in a table until the sell/damage/lost button click. 
         $companies = Company::all();
         $stock_add_quantities = DB::table('stock_outs')
                     ->join('companies','companies.id','=','stock_outs.company_id')
                     ->join('items','items.id','=','stock_outs.item_id')
                     ->select('items.itemName','companies.companyName','stock_outs.add_quantity')
                     ->where([
-                        'stock_outs.action_no' => $last_action_no,
+                        'stock_outs.action_no' => 1,
                 ])->get();
 
         return view('dashboard.stockOut.create',compact('companies','stock_add_quantities'));
@@ -163,35 +124,16 @@ class StockOutController extends Controller
     
     public function sell(Request $request) // Sell এ ক্লিক করলে add_quantity ডাটাগুলা sell_quantity তে ট্রান্সফার হবে |&| (stock_ins টেবিলের stock_in) থেকে (stock_outs এর sell_quantity'র) ডাটা বিয়োগ হবে মানে [stock_in - sell_quantity]  
     {
-        // //retrive last action no
-        $last_row_action_no  =  DB::table('stock_outs')
-                            ->select('action_no')
-                            ->orderBy('id','DESC')
-                            ->limit(1)
-                            ->first();
-        if (isset($last_row_action_no)) 
-        {
-            $last_action_no = (int)$last_row_action_no->action_no;
-        }
 
-
-        // ধরি যাদের যাদের Action_no == 1 তাদেরকেই follow করবে, similarly 1,2,3..... 
         $data = DB::table('stock_outs')
-                        ->where([
-                            'action_no' => $last_action_no
-                        ])->get();
-        // return $data;
+                        ->where('action_no',1)
+                        ->get();
 
-        foreach ($data as $item) 
+        foreach ($data as $item) // প্রতি লুপে তাদের প্রত্যেকের Row আইডেন্টিফাই করা হবে । পরবর্তী একই আইটেম ভিন্ন কোম্পানি হতে পারে 
         {
-            $stock_out  = StockOut::find($item->id) //stock_out's- id
-                                        ->where([
-                                            'company_id' => $item->company_id,
-                                            'item_id'    => $item->item_id,
-                                            'action_no'  => $last_action_no,
-                                        ])
-                                        ->first(); // প্রতি লুপে তাদের প্রত্যেকের Row আইডেন্টিফাই করা হবে । পরবর্তী একই আইটেম ভিন্ন কোম্পানি হতে পারে 
-            $stock_out->sell_quantity = $item->add_quantity;
+            $stock_out  = StockOut::find($item->id); //stock_out's- id      
+            $stock_out->sell_quantity = $item->add_quantity;  //actually the sell_quantity does not need .
+            $stock_out->action_no = 0;
             $stock_out->status = "SOLD";
             $stock_out->update();
                                 
@@ -221,35 +163,16 @@ class StockOutController extends Controller
     //I did not setup of reduce quantity from "Stock In" after clicking the "Damage"
     public function damage(Request $request) // damage এ ক্লিক করলে add_quantity ডাটাগুলা damage_quantity তে ট্রান্সফার হবে 
     {
-        // //retrive last action no
-        $last_row_action_no  =  DB::table('stock_outs')
-                            ->select('action_no')
-                            ->orderBy('id','DESC')
-                            ->limit(1)
-                            ->first();
-        if (isset($last_row_action_no)) 
-        {
-            $last_action_no = (int)$last_row_action_no->action_no;
-        }
-
-
-        // ধরি যাদের যাদের Action_no == 1 তাদেরকেই follow করবে, similarly 1,2,3 ..... 
         $data = DB::table('stock_outs')
-                        ->where([
-                            'action_no' => $last_action_no
-                        ])->get();
-        // return $data;
+                    ->where('action_no', 1)
+                    ->get();
 
-        foreach ($data as $item) 
+
+        foreach ($data as $item) // প্রতি লুপে তাদের প্রত্যেকের Row আইডেন্টিফাই করা হবে । পরবর্তী একই আইটেম ভিন্ন কোম্পানি হতে পারে 
         {
-            $stock_out  = StockOut::find($item->id) //stock_out's- id
-                                        ->where([
-                                            'company_id' => $item->company_id,
-                                            'item_id'    => $item->item_id,
-                                            'action_no'  => $last_action_no,
-                                        ])
-                                        ->first(); // প্রতি লুপে তাদের প্রত্যেকের Row আইডেন্টিফাই করা হবে । পরবর্তী একই আইটেম ভিন্ন কোম্পানি হতে পারে 
+            $stock_out  = StockOut::find($item->id); //stock_out's- id 
             $stock_out->damage_quantity = $item->add_quantity;
+            $stock_out->action_no = 0;
             $stock_out->status = "DAMAGE";
             $stock_out->update();
         }
@@ -266,35 +189,17 @@ class StockOutController extends Controller
     //I did not setup of reduce quantity from "Stock In" after clicking the "Lost"
     public function lost(Request $request) // lost এ ক্লিক করলে add_quantity ডাটাগুলা lost_quantity তে ট্রান্সফার হবে 
     {
-        // //retrive last action no
-        $last_row_action_no  =  DB::table('stock_outs')
-                            ->select('action_no')
-                            ->orderBy('id','DESC')
-                            ->limit(1)
-                            ->first();
-        if (isset($last_row_action_no)) 
-        {
-            $last_action_no = (int)$last_row_action_no->action_no;
-        }
+        $data = DB::table('stock_outs')
+                    ->where('action_no', 1)
+                    ->get();
         
 
-        // ধরি যাদের যাদের Action_no == 1 তাদেরকেই follow করবে, similarly 1,2,3 ..... 
-        $data = DB::table('stock_outs')
-                        ->where([
-                            'action_no' => $last_action_no
-                        ])->get();
-        // return $data;
-
-        foreach ($data as $item) 
+        foreach ($data as $item)  // প্রতি লুপে তাদের প্রত্যেকের Row আইডেন্টিফাই করা হবে । পরবর্তী একই আইটেম ভিন্ন কোম্পানি হতে পারে 
         {
-            $stock_out  = StockOut::find($item->id) //stock_out's- id
-                                        ->where([
-                                            'company_id' => $item->company_id,
-                                            'item_id'    => $item->item_id,
-                                            'action_no'  => $last_action_no,
-                                        ])
-                                        ->first(); // প্রতি লুপে তাদের প্রত্যেকের Row আইডেন্টিফাই করা হবে । পরবর্তী একই আইটেম ভিন্ন কোম্পানি হতে পারে 
+            $stock_out  = StockOut::find($item->id); //stock_out's- id
+                                        
             $stock_out->lost_quantity = $item->add_quantity;
+            $stock_out->action_no = 0;
             $stock_out->status = "LOST";
             $stock_out->update();
         }
