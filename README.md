@@ -1,3 +1,11 @@
+## Please Visit: 
+
+site: http://stock-management-system-bitm.herokuapp.com/
+ 
+username & password : admin@gmail.com
+
+
+
 <div align="center">
   
 # Project Specification
